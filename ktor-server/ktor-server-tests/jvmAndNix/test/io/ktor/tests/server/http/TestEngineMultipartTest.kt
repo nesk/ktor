@@ -123,7 +123,7 @@ class TestEngineMultipartTest {
 
     private fun testMultiPartsFileItemBase(
         filename: String,
-        provider: () -> Input,
+        provider: () -> DROP_Input,
         extraFileAssertions: (file: PartData.FileItem) -> Unit
     ) {
         testMultiParts(

@@ -86,9 +86,7 @@ internal class RequestBodyHandler(
     }
 
     fun newChannel(): ByteReadChannel {
-        val result = ByteChannel()
-        tryOfferChannelOrToken(result)
-        return result
+        TODO()
     }
 
     @OptIn(ExperimentalCoroutinesApi::class)
@@ -150,7 +148,7 @@ internal class RequestBodyHandler(
             } ?: break
 
             when (e) {
-                is ByteChannel -> e.close()
+                is ByteWriteChannel -> e.close()
                 is ReferenceCounted -> e.release()
                 else -> {
                 }
@@ -162,7 +160,7 @@ internal class RequestBodyHandler(
         val length = buf.readableBytes()
         if (length > 0) {
             val buffer = buf.internalNioBuffer(buf.readerIndex(), length)
-            dst.writeFully(buffer)
+            dst.writeByteBuffer(buffer)
         }
 
         return max(length, 0)

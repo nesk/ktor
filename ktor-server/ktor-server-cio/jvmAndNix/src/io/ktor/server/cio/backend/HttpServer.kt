@@ -63,8 +63,8 @@ public fun CoroutineScope.httpServer(
                     val client: Socket = server.accept()
 
                     val connection = ServerIncomingConnection(
-                        client.openReadChannel(),
-                        client.openWriteChannel(),
+                        client.attachForReading(),
+                        client.attachForWriting(),
                         client.remoteAddress.toNetworkAddress(),
                         client.localAddress.toNetworkAddress()
                     )

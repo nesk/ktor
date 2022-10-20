@@ -6,6 +6,7 @@ package io.ktor.client.plugins.logging
 
 import io.ktor.client.statement.*
 import io.ktor.http.*
+import io.ktor.io.*
 import io.ktor.utils.io.*
 import io.ktor.utils.io.charsets.*
 import io.ktor.utils.io.core.*
@@ -38,7 +39,7 @@ internal fun logResponseHeader(log: StringBuilder, response: HttpResponse, level
 }
 
 internal suspend inline fun ByteReadChannel.tryReadText(charset: Charset): String? = try {
-    readRemaining().readText(charset = charset)
+    readRemaining().readString(charset = charset)
 } catch (cause: Throwable) {
     null
 }

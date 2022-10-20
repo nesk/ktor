@@ -8,6 +8,7 @@ import io.ktor.client.request.*
 import io.ktor.client.statement.*
 import io.ktor.http.*
 import io.ktor.http.content.*
+import io.ktor.io.*
 import io.ktor.serialization.*
 import io.ktor.server.application.*
 import io.ktor.server.plugins.*
@@ -40,7 +41,7 @@ class ContentNegotiationTest {
 
         override suspend fun deserialize(charset: Charset, typeInfo: TypeInfo, content: ByteReadChannel): Any? {
             if (typeInfo.type != Wrapper::class) return null
-            return Wrapper(content.readRemaining().readText().removeSurrounding("[", "]"))
+            return Wrapper(content.readRemaining().readString().removeSurrounding("[", "]"))
         }
     }
 
@@ -57,7 +58,7 @@ class ContentNegotiationTest {
 
         override suspend fun deserialize(charset: Charset, typeInfo: TypeInfo, content: ByteReadChannel): Any? {
             if (typeInfo.type != Wrapper::class) return null
-            return Wrapper(content.readRemaining().readText())
+            return Wrapper(content.readRemaining().readString())
         }
     }
 

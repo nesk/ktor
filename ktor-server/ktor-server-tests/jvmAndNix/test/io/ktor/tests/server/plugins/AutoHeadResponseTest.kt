@@ -6,6 +6,7 @@ package io.ktor.tests.server.plugins
 
 import io.ktor.http.*
 import io.ktor.http.content.*
+import io.ktor.io.*
 import io.ktor.server.application.*
 import io.ktor.server.plugins.autohead.*
 import io.ktor.server.plugins.statuspages.*
@@ -73,7 +74,7 @@ class AutoHeadResponseTest {
                 get("/") {
                     call.respond(
                         object : OutgoingContent.ReadChannelContent() {
-                            override fun readFrom() = ByteReadChannel("Hello".toByteArray())
+                            override fun readFrom() = ByteReadChannel("Hello")
 
                             override val headers: Headers
                                 get() = Headers.build {

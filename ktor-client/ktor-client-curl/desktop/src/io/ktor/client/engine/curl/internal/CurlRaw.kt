@@ -11,6 +11,7 @@ import io.ktor.client.plugins.*
 import io.ktor.client.request.*
 import io.ktor.http.*
 import io.ktor.http.content.*
+import io.ktor.io.*
 import io.ktor.utils.io.*
 import io.ktor.utils.io.core.*
 import kotlinx.cinterop.*
@@ -48,8 +49,8 @@ internal class CurlRequestData(
 }
 
 internal class CurlResponseBuilder(val request: CurlRequestData) {
-    val headersBytes = DROP_BytePacketBuilder()
-    val bodyChannel = ByteChannel(true).apply { attachJob(request.executionContext) }
+    val headersBytes = Packet()
+    val bodyChannel = ConflatedByteChannel()
 }
 
 internal sealed class CurlResponseData
@@ -77,7 +78,7 @@ internal suspend fun OutgoingContent.toByteChannel(): ByteReadChannel = when (th
     }
     is OutgoingContent.WriteChannelContent -> GlobalScope.writer(coroutineContext) {
         writeTo(channel)
-    }.channel
+    }
     is OutgoingContent.ReadChannelContent -> readFrom()
     is OutgoingContent.NoContent -> ByteReadChannel.Empty
     else -> throw UnsupportedContentTypeException(this@toByteChannel)

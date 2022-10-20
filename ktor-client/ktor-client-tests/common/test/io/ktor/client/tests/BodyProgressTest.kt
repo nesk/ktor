@@ -16,6 +16,7 @@ import io.ktor.client.statement.*
 import io.ktor.client.tests.utils.*
 import io.ktor.http.*
 import io.ktor.http.content.*
+import io.ktor.io.*
 import io.ktor.utils.io.*
 import io.ktor.utils.io.core.*
 import kotlinx.coroutines.*
@@ -26,7 +27,6 @@ private val DOUBLE_TEST_ARRAY = ByteArray(16 * 1025) { 1 }
 private val TEST_ARRAY = ByteArray(8 * 1025) { 1 }
 private val TEST_NAME = "123".repeat(5000)
 
-@OptIn(DelicateCoroutinesApi::class)
 class BodyProgressTest : ClientLoader(timeoutSeconds = 10) {
 
     @Serializable
@@ -67,8 +67,8 @@ class BodyProgressTest : ClientLoader(timeoutSeconds = 10) {
                     object : OutgoingContent.WriteChannelContent() {
                         override val contentType = ContentType.Application.OctetStream
                         override suspend fun writeTo(channel: ByteWriteChannel) {
-                            channel.writeFully(TEST_ARRAY)
-                            channel.writeFully(TEST_ARRAY)
+                            channel.writeByteArray(TEST_ARRAY)
+                            channel.writeByteArray(TEST_ARRAY)
                             channel.close()
                         }
                     }
@@ -86,11 +86,9 @@ class BodyProgressTest : ClientLoader(timeoutSeconds = 10) {
             invokedCount = 0
             val listener: ProgressListener = { _, _ -> invokedCount++ }
 
-            val channel = ByteChannel()
-            GlobalScope.launch {
-                channel.writeFully(TEST_ARRAY)
-                channel.writeFully(TEST_ARRAY)
-                channel.close()
+            val channel = ByteReadChannel {
+                writeByteArray(TEST_ARRAY)
+                writeByteArray(TEST_ARRAY)
             }
 
             val response: HttpResponse = client.post("$TEST_SERVER/content/echo") {
@@ -122,11 +120,10 @@ class BodyProgressTest : ClientLoader(timeoutSeconds = 10) {
         test { client ->
             val listener: ProgressListener = { _, _ -> }
 
-            val channel = ByteChannel()
-            GlobalScope.launch {
-                channel.writeFully(TEST_ARRAY)
-                channel.writeFully(TEST_ARRAY)
-                channel.close(RuntimeException("Error"))
+            val channel = ByteReadChannel {
+                writeByteArray(TEST_ARRAY)
+                writeByteArray(TEST_ARRAY)
+                close(RuntimeException("Error"))
             }
 
             assertFailsWith<RuntimeException> {
@@ -191,18 +188,16 @@ class BodyProgressTest : ClientLoader(timeoutSeconds = 10) {
             invokedCount = 0
             val listener: ProgressListener = { _, _ -> invokedCount++ }
 
-            val channel = ByteChannel()
-            GlobalScope.launch {
-                channel.writeFully(TEST_ARRAY)
-                channel.writeFully(TEST_ARRAY)
-                channel.close()
+            val channel = ByteReadChannel {
+                writeByteArray(TEST_ARRAY)
+                writeByteArray(TEST_ARRAY)
             }
 
             client.preparePost("$TEST_SERVER/content/echo") {
                 setBody(channel)
                 onDownload(listener)
             }.execute {
-                val result = it.body<ByteReadChannel>().readRemaining().readBytes()
+                val result = it.body<ByteReadChannel>().readRemaining().toByteArray()
                 assertContentEquals(DOUBLE_TEST_ARRAY, result)
             }
             assertTrue(invokedCount > 2)
@@ -215,18 +210,16 @@ class BodyProgressTest : ClientLoader(timeoutSeconds = 10) {
             invokedCount = 0
             val listener: ProgressListener = { _, _ -> invokedCount++ }
 
-            val channel = ByteChannel()
-            GlobalScope.launch {
-                channel.writeFully(TEST_ARRAY)
-                channel.writeFully(TEST_ARRAY)
-                channel.close()
+            val channel = ByteReadChannel {
+                writeByteArray(TEST_ARRAY)
+                writeByteArray(TEST_ARRAY)
             }
 
             client.preparePost("$TEST_SERVER/content/echo") {
                 setBody(channel)
                 onDownload(listener)
             }.body<ByteReadChannel, Unit> {
-                val result = it.readRemaining().readBytes()
+                val result = it.readRemaining().toByteArray()
                 assertContentEquals(DOUBLE_TEST_ARRAY, result)
             }
             assertTrue(invokedCount > 2)

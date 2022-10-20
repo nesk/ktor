@@ -283,7 +283,7 @@ class TestApplicationTest {
                 client.post("/") {
                     setBody(object : OutgoingContent.WriteChannelContent() {
                         override suspend fun writeTo(channel: ByteWriteChannel) {
-                            channel.writeStringUtf8("OK")
+                            channel.writeString("OK")
                             secondRequestStarted.await()
                             channel.flush()
                         }

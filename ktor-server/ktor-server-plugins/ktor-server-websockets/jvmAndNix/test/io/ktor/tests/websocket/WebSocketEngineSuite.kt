@@ -5,6 +5,7 @@
 package io.ktor.tests.websocket
 
 import io.ktor.http.*
+import io.ktor.io.*
 import io.ktor.network.selector.*
 import io.ktor.network.sockets.*
 import io.ktor.server.application.*
@@ -382,7 +383,7 @@ abstract class WebSocketEngineSuite<TEngine : ApplicationEngine, TConfiguration 
                 for (i in 1..count) {
                     writeHex("0x81")
                     writeByte(i.toByte())
-                    writeFully(bytes, 0, i)
+                    writeByteArray(bytes, 0, i)
                     flush()
                 }
 
@@ -422,7 +423,7 @@ abstract class WebSocketEngineSuite<TEngine : ApplicationEngine, TConfiguration 
                 for (i in 1..count) {
                     val f = readFrame(Long.MAX_VALUE, 0)
                     assertEquals(FrameType.TEXT, f.frameType)
-                    assertEquals(template.substring(0, i), ByteReadPacket(f.data).readText(Charsets.ISO_8859_1))
+                    assertEquals(template.substring(0, i), Packet(f.data).readString(Charsets.ISO_8859_1))
                 }
             }
 
@@ -581,7 +582,7 @@ abstract class WebSocketEngineSuite<TEngine : ApplicationEngine, TConfiguration 
     private suspend fun Connection.negotiateHttpWebSocket() {
         // send upgrade request
         output.apply {
-            writeFully(
+            writeByteArray(
                 """
                     GET / HTTP/1.1
                     Host: localhost:$port
@@ -596,7 +597,7 @@ abstract class WebSocketEngineSuite<TEngine : ApplicationEngine, TConfiguration 
                     "\r\n"
                 ).encodeToByteArray()
             )
-            writeFully("\r\n\r\n".encodeToByteArray())
+            writeByteArray("\r\n\r\n".encodeToByteArray())
             flush()
         }
 
@@ -624,7 +625,7 @@ abstract class WebSocketEngineSuite<TEngine : ApplicationEngine, TConfiguration 
         }
     }
 
-    private suspend fun ByteWriteChannel.writeHex(hex: String) = writeFully(fromHexDump(hex))
+    private suspend fun ByteWriteChannel.writeHex(hex: String) = writeByteArray(fromHexDump(hex))
 
     private fun fromHexDump(hex: String) = hex(hex.replace("0x", "").replace("\\s+".toRegex(), ""))
 

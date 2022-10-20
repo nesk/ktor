@@ -105,7 +105,7 @@ public suspend fun CacheStorage.store(response: HttpResponse): CachedResponseDat
 @OptIn(InternalAPI::class)
 public suspend fun CacheStorage.store(response: HttpResponse, varyKeys: Map<String, String>): CachedResponseData {
     val url = response.call.request.url
-    val body = response.content.readRemaining().readBytes()
+    val body = response.content.readRemaining().toByteArray()
     response.complete()
     val data = CachedResponseData(
         url = response.call.request.url,

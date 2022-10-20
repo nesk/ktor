@@ -6,6 +6,7 @@ package io.ktor.client.engine.curl.internal
 
 import io.ktor.client.engine.curl.*
 import io.ktor.client.plugins.*
+import io.ktor.io.*
 import io.ktor.utils.io.core.*
 import kotlinx.atomicfu.locks.*
 import kotlinx.cinterop.*
@@ -235,7 +236,7 @@ internal class CurlMultiApiHandler : Closeable {
                 return CurlFail(cause)
             } finally {
                 responseBuilder.bodyChannel.close(cause)
-                responseBuilder.headersBytes.release()
+                responseBuilder.headersBytes.close()
             }
         } finally {
             curl_multi_remove_handle(multiHandle, easyHandle).verify()
@@ -263,7 +264,7 @@ internal class CurlMultiApiHandler : Closeable {
                     ?: collectSuccessResponse(easyHandle)!!
             } finally {
                 responseBuilder.bodyChannel.close(null)
-                responseBuilder.headersBytes.release()
+                responseBuilder.headersBytes.close()
             }
         } finally {
             curl_multi_remove_handle(multiHandle, easyHandle).verify()
@@ -328,7 +329,7 @@ internal class CurlMultiApiHandler : Closeable {
 
         val responseBuilder = responseDataRef.value!!.fromCPointer<CurlResponseBuilder>()
         with(responseBuilder) {
-            val headers = headersBytes.build().readBytes()
+            val headers = headersBytes.toByteArray()
 
             CurlSuccess(
                 httpStatusCode.value.toInt(),

@@ -4,6 +4,7 @@
 package io.ktor.serialization.kotlinx.test.json
 
 import io.ktor.http.*
+import io.ktor.io.*
 import io.ktor.serialization.*
 import io.ktor.serialization.kotlinx.*
 import io.ktor.serialization.kotlinx.json.*
@@ -12,7 +13,6 @@ import io.ktor.test.dispatcher.*
 import io.ktor.util.reflect.*
 import io.ktor.utils.io.*
 import io.ktor.utils.io.charsets.*
-import io.ktor.utils.io.core.*
 import kotlinx.serialization.*
 import kotlinx.serialization.descriptors.*
 import kotlinx.serialization.encoding.*
@@ -20,7 +20,6 @@ import kotlinx.serialization.json.*
 import kotlinx.serialization.modules.*
 import kotlin.test.*
 
-@OptIn(ExperimentalSerializationApi::class)
 class JsonSerializationTest : AbstractSerializationTest<Json>() {
     override val defaultContentType: ContentType = ContentType.Application.Json
     override val defaultSerializationFormat: Json = DefaultJson

@@ -7,12 +7,14 @@ package io.ktor.server.testing
 import io.ktor.client.request.*
 import io.ktor.http.*
 import io.ktor.http.content.*
+import io.ktor.io.*
 import io.ktor.server.application.*
 import io.ktor.server.plugins.callloging.*
 import io.ktor.server.request.*
 import io.ktor.server.response.*
 import io.ktor.server.routing.*
 import io.ktor.server.sessions.*
+import io.ktor.utils.io.*
 import io.ktor.utils.io.core.*
 import kotlinx.coroutines.*
 import java.lang.Runnable
@@ -25,10 +27,7 @@ import kotlin.test.*
 class TestApplicationEngineTest {
     @Test
     fun testCustomDispatcher() {
-        @OptIn(
-            ExperimentalCoroutinesApi::class,
-            InternalCoroutinesApi::class
-        )
+        @OptIn(InternalCoroutinesApi::class)
         fun CoroutineDispatcher.withDelay(delay: Delay): CoroutineDispatcher =
             object : CoroutineDispatcher(), Delay by delay {
                 override fun isDispatchNeeded(context: CoroutineContext): Boolean =
@@ -68,9 +67,7 @@ class TestApplicationEngineTest {
             }
         ) {
             val elapsedTime = measureTimeMillis {
-                handleRequest(HttpMethod.Get, "/").let { call ->
-                    assertTrue(call.response.status()!!.isSuccess())
-                }
+                assertTrue(handleRequest(HttpMethod.Get, "/").response.status()!!.isSuccess())
             }
             assertEquals(listOf("Delay($delayTime)", "Delay($delayTime)"), delayLog)
             assertTrue { elapsedTime < (delayTime * 2) }
@@ -260,7 +257,7 @@ class TestApplicationEngineTest {
             val boundary = "***bbb***"
             val multipart = listOf(
                 PartData.FileItem(
-                    { buildPacket { writeText("BODY") } },
+                    { ByteReadChannel("BODY") },
                     {},
                     headersOf(
                         HttpHeaders.ContentDisposition,

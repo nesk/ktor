@@ -6,6 +6,8 @@ package io.ktor.client.plugins.cache.storage
 
 import io.ktor.http.*
 import io.ktor.io.*
+import io.ktor.io.copyTo
+import io.ktor.io.jvm.javaio.*
 import io.ktor.util.*
 import io.ktor.util.collections.*
 import io.ktor.util.date.*

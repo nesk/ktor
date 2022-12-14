@@ -5,6 +5,7 @@
 package io.ktor.serialization.kotlinx
 
 import io.ktor.http.*
+import io.ktor.io.charsets.*
 import io.ktor.util.reflect.*
 import io.ktor.utils.io.charsets.*
 import kotlinx.serialization.*

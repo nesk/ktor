@@ -5,7 +5,6 @@
 package io.ktor.http
 
 import io.ktor.io.charsets.*
-import io.ktor.utils.io.charsets.*
 
 /**
  * Represents a value for a `Content-Type` header.
@@ -280,7 +279,7 @@ public class BadContentTypeFormatException(value: String) : Exception("Bad Conte
  * Creates a copy of `this` type with the added charset parameter with [charset] value.
  */
 public fun ContentType.withCharset(charset: Charset): ContentType =
-    withParameter("charset", charset.name)
+    withParameter("charset", charset.name())
 
 /**
  * Creates a copy of `this` type with the added charset parameter with [charset] value
@@ -290,7 +289,7 @@ public fun ContentType.withCharsetIfNeeded(charset: Charset): ContentType =
     if (contentType.lowercase() == "application" && contentSubtype.lowercase() == "json") {
         this
     } else {
-        withParameter("charset", charset.name)
+        withParameter("charset", charset.name())
     }
 
 /**

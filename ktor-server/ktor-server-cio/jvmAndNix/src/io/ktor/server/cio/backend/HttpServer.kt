@@ -4,6 +4,7 @@
 
 package io.ktor.server.cio.backend
 
+import io.ktor.io.*
 import io.ktor.network.selector.*
 import io.ktor.network.sockets.*
 import io.ktor.server.cio.*
@@ -12,7 +13,6 @@ import io.ktor.server.engine.*
 import io.ktor.server.engine.internal.*
 import io.ktor.util.*
 import io.ktor.util.logging.*
-import io.ktor.utils.io.core.*
 import kotlinx.coroutines.*
 
 /**
@@ -27,7 +27,6 @@ public fun CoroutineScope.httpServer(
 
     val serverLatch: CompletableJob = Job()
 
-    @OptIn(ExperimentalCoroutinesApi::class)
     val serverJob = launch(
         context = CoroutineName("server-root-${settings.port}"),
         start = CoroutineStart.UNDISPATCHED

@@ -3,8 +3,8 @@
 */
 
 plugins {
-    id("org.gradle.kotlin.kotlin-dsl") version "3.2.4"
-    kotlin("plugin.serialization") version "1.7.22"
+    `kotlin-dsl`
+    kotlin("plugin.serialization") version "1.7.10"
 }
 
 val buildSnapshotTrain = properties["build_snapshot_train"]?.toString()?.toBoolean() == true
@@ -22,8 +22,8 @@ sourceSets.main {
 }
 
 dependencies {
-    implementation(kotlin("gradle-plugin", "1.7.22"))
-    implementation(kotlin("serialization", "1.7.22"))
+    implementation(kotlin("gradle-plugin", "1.8.0-RC"))
+    implementation(kotlin("serialization", "1.8.0-RC"))
 
     val ktlint_version = libs.versions.ktlint.version.get()
     implementation("org.jmailen.gradle:kotlinter-gradle:$ktlint_version")

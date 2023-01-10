@@ -22,8 +22,8 @@ sourceSets.main {
 }
 
 dependencies {
-    implementation(kotlin("gradle-plugin", "1.8.0-RC"))
-    implementation(kotlin("serialization", "1.8.0-RC"))
+    implementation(kotlin("gradle-plugin", "1.8.0"))
+    implementation(kotlin("serialization", "1.8.0"))
 
     val ktlint_version = libs.versions.ktlint.version.get()
     implementation("org.jmailen.gradle:kotlinter-gradle:$ktlint_version")

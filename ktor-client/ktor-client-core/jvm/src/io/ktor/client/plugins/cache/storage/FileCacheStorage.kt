@@ -103,13 +103,16 @@ private class FileCacheStorage(
             if (!file.exists()) return emptySet()
 
             file.inputStream().buffered().use {
-                val channel = it.toByteReadChannel().stringReader()
-                val requestsCount = channel.readInt()
-                val caches = mutableSetOf<CachedResponseData>()
-                for (i in 0 until requestsCount) {
-                    caches.add(readCache(channel))
+                val channel = it.toByteReadChannel()
+                val caches = channel.stringReader { reader ->
+                    val requestsCount = reader.readInt()
+                    val caches = mutableSetOf<CachedResponseData>()
+                    for (i in 0 until requestsCount) {
+                        caches.add(readCache(reader))
+                    }
+                    caches
                 }
-                channel.discard()
+                channel.cancel()
                 return caches
             }
         }

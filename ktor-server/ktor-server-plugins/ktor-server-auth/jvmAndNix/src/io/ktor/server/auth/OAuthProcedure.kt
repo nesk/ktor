@@ -7,7 +7,6 @@ package io.ktor.server.auth
 import io.ktor.client.*
 import io.ktor.server.application.*
 import io.ktor.util.logging.*
-import io.ktor.utils.io.errors.*
 
 private val Logger: Logger = KtorSimpleLogger("io.ktor.auth.oauth")
 
